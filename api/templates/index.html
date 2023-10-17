@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data['material'] }}</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.6.2.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-5.2.3-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/index.css') }}">
+    <script src="{{ url_for('static', filename='bootstrap-5.2.3-dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+</head>
+<body style="height: 100vh;width: 100%">
+{#<p>{{ time }}</p>#}
+{#<p>{{ c }}</p>#}
+<div class="main_tu">
+    <div id="container1" style="height: 50vh;width: 49%" class="col-md-6 col-sm-6 col-xs-12">
+    </div>
+    <div id="container2" style="height: 50vh;width: 49%" class="col-md-6 col-sm-6 col-xs-12">
+    </div>
+    <div id="container3" style="height: 50vh;width: 49%" class="col-md-6 col-sm-6 col-xs-12">
+    </div>
+    <div id="container4" style="height: 50vh;width: 49%" class="col-md-6 col-sm-6 col-xs-12">
+    </div>
+</div>
+
+<script type="text/javascript">
+    function temperature() {
+        const dom = document.getElementById('container1');
+        let myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        let app = {};
+
+        let option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    // Use axis to trigger tooltip
+                    type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'value',
+            },
+            yAxis: [
+                {
+                    type: 'category',
+                    name: '温度',
+                    axisLabel: {
+                        formatter: '{value} °C'
+                    },
+                    data: {{ temperature[1:] }}
+                },
+                {
+                    type: 'category',
+                    name: '当前温度',
+                    axisLabel: {
+                        formatter: '{value} °C'
+                    },
+                    data: [{{ temperature[0] }}]
+                }
+            ],
+            series: [
+                {
+                    name: '预期使用时长(单位:次)',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: {{ time_temperature[1:] }},
+                    backgroundStyle: {
+                        color: 'rgba(220, 220, 220, 0.8)'
+                    },
+                    showBackground: true
+                },
+                {
+                    name: '当前预估使用时长(单位:次)',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [{{ time_temperature[0] }}],
+                    backgroundStyle: {
+                        color: 'rgba(220, 220, 220, 0.8)'
+                    },
+                    showBackground: true
+                }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+
+    }
+
+    function humidity() {
+        const dom = document.getElementById('container2');
+        let myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        let app = {};
+
+        let option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    // Use axis to trigger tooltip
+                    type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'value',
+                min:{{ time_humidity[1] }},
+                max:{{ time_humidity[-1] }}
+            },
+            yAxis: [
+                {
+                    type: 'category',
+                    name: '湿度',
+                    axisLabel: {
+                        formatter: '{value} %'
+                    },
+                    data: {{ humidity[1:] }}
+                },
+                {
+                    type: 'category',
+                    name: '当前湿度',
+                    axisLabel: {
+                        formatter: '{value} %'
+                    },
+                    data: [{{ humidity[0] }}]
+                }
+            ],
+            series: [
+                {
+                    name: '预期使用时长(单位:次)',
+                    type: 'line',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: {{ time_humidity[1:] }}
+                },
+                {
+                    name: '当前预估使用时长（次）',
+                    type: 'bar',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [{{ time_humidity[0] }}],
+                    backgroundStyle: {
+                        color: 'rgba(220, 220, 220, 0.8)'
+                    },
+                    showBackground: true
+                }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+
+    }
+
+    function force() {
+        const dom = document.getElementById('container3');
+        let myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        let app = {};
+
+        let option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    // Use axis to trigger tooltip
+                    type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                },
+                label: {
+                    backgroundColor: '#6a7985'
+                },
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'value',
+                min:{{ time_force[1] }},
+                max:{{ time_force[-1] }}
+            },
+            yAxis: [
+                {
+                    type: 'category',
+                    name: '应力',
+                    data: {{ force[1:] }}
+                },
+                {
+                    type: 'category',
+                    name: '应力',
+                    data: [{{ force[0] }}]
+                }
+            ],
+            series: [
+                {
+                    name: '预期使用时长',
+                    type: 'line',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: {{ time_force[1:] }}
+                },
+                {
+                    name: '当前预估使用时长（次）',
+                    type: 'bar',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [{{ time_force[0] }}],
+                    backgroundStyle: {
+                        color: 'rgba(220, 220, 220, 0.8)'
+                    },
+                    showBackground: true
+                }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+
+    }
+
+    function all() {
+        const dom = document.getElementById('container4');
+        let myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        let app = {};
+
+        let option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['温度', '湿度', '应力', '权重和']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: {{ s }}
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '温度',
+                    type: 'bar',
+
+                    data: {{ time_temperature }}
+                },
+                {
+                    name: '湿度',
+                    type: 'bar',
+
+                    data: {{ time_humidity }}
+                },
+                {
+                    name: '应力',
+                    type: 'bar',
+
+                    data: {{ time_force }}
+                },
+                {
+                    name: '权重和',
+                    type: 'bar',
+
+                    data: {{ all_time }}
+                }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+
+    }
+
+    temperature()
+    humidity()
+    force()
+    all()
+</script>
+</body>
+</html>
